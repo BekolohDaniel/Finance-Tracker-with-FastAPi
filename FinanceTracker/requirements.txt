@@ -1,5 +1,0 @@
-pydantic==2.11
-sqlmodel==0.0.24
-PyJWT==2.10.1
-fastapi==0.115.12
-passlib==1.7.4

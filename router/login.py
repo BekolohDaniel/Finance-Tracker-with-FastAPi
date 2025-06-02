@@ -1,20 +1,24 @@
 from datetime import timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+import jwt
+from fastapi import APIRouter, Depends, HTTPException, status, Body
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import select
+
 
 from database.authentication import SessionDep
 from model.models import User
 from schema.schemas import Token
-from utils.oauth2 import ACCESS_TOKEN_EXPIRE_DAYS, create_access_token
+from utils.oauth2 import ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, SECRET_KEY, ALGORITHM
 from utils.security import verify_password
 
 login_route = APIRouter(
     prefix="/login",
     tags = ['Login']
 )
+
+ACCESS_TOKEN_EXPIRE_DAYS = 30  
 
 @login_route.post("/", response_model=Token)
 async def login_for_access_token(
@@ -29,8 +33,13 @@ async def login_for_access_token(
 
     if not verify_password(form_data.password, db_user.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Password. Try again")
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_DAYS)
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": db_user.email}, expires_delta=access_token_expires
     )
-    return Token(access_token=access_token, token_type="bearer")
+
+    refresh_token = create_access_token(
+        data={"sub": db_user.email, "refresh": True}, expires_delta=timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
+    )
+    return Token(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
+
