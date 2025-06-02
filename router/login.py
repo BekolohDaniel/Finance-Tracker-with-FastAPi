@@ -1,8 +1,7 @@
 from datetime import timedelta
 from typing import Annotated
 
-import jwt
-from fastapi import APIRouter, Depends, HTTPException, status, Body
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import select
 
@@ -10,15 +9,13 @@ from sqlmodel import select
 from database.authentication import SessionDep
 from model.models import User
 from schema.schemas import Token
-from utils.oauth2 import ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, SECRET_KEY, ALGORITHM
+from utils.oauth2 import ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, ACCESS_TOKEN_EXPIRE_DAYS
 from utils.security import verify_password
 
 login_route = APIRouter(
     prefix="/login",
     tags = ['Login']
 )
-
-ACCESS_TOKEN_EXPIRE_DAYS = 30  
 
 @login_route.post("/", response_model=Token)
 async def login_for_access_token(
@@ -38,8 +35,5 @@ async def login_for_access_token(
         data={"sub": db_user.email}, expires_delta=access_token_expires
     )
 
-    refresh_token = create_access_token(
-        data={"sub": db_user.email, "refresh": True}, expires_delta=timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
-    )
-    return Token(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
+    return Token(access_token=access_token, token_type="bearer")
 
