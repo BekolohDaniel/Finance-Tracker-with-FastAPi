@@ -27,6 +27,7 @@ class UpdateUserInfo(BaseModel):
 class TransactionSchema(BaseModel):
     amount: float
     description: str
+    category_id: Optional[int] = None
     type: TransactionType
     timestamp: datetime
 

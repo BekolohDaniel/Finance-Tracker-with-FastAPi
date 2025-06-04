@@ -10,6 +10,7 @@ class TransactionType(str, Enum):
     income = "income"
     expense = "expense"
 
+
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(index=True)
@@ -22,7 +23,7 @@ class User(SQLModel, table=True):
 class Category(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(index=True, unique=True)
-    type: str = Field(default=TransactionType)
+    type: str = Field(default=TransactionType.expense, sa_column_kwargs={"default": TransactionType.expense})
 
     transactions: List["Transaction"] = Relationship(back_populates="category")
 
@@ -32,7 +33,7 @@ class Transaction(SQLModel, table=True):
     category_id: Optional[int] = Field(foreign_key="category.id")
     amount: float
     description: str
-    type: TransactionType = Field(default=TransactionType.expense)
+    type: TransactionType = Field(default=TransactionType.expense, sa_column_kwargs={"default": TransactionType.expense})
     timestamp: datetime = Field(default_factory=lambda : datetime.now(timezone.utc))
 
     user: Optional[User] = Relationship(back_populates="transactions")
