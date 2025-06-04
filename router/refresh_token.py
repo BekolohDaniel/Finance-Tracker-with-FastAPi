@@ -17,8 +17,8 @@ refresh_route = APIRouter(
 
 @refresh_route.post("/", response_model=Token)
 async def refresh_access_token(
-    refresh_token: str = Body(..., embed=True),
-    session: SessionDep = Depends()
+    session: SessionDep,
+    refresh_token: str = Body(..., embed=True)
 ):
     try:
         payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])

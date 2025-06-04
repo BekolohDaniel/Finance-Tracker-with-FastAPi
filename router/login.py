@@ -35,5 +35,8 @@ async def login_for_access_token(
         data={"sub": db_user.email}, expires_delta=access_token_expires
     )
 
-    return Token(access_token=access_token, token_type="bearer")
+    refresh_token = create_access_token(
+        data={"sub": db_user.email, "refresh": True}, expires_delta=timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
+    )
+    return Token(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
 

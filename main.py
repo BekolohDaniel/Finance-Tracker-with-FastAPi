@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 
 from database.authentication import create_db_and_tables
-from router import user, login, transaction, category
+from router import user, login, transaction, category, refresh_token
 
 
 @asynccontextmanager
@@ -31,6 +31,8 @@ app.include_router(user.user_route)
 app.include_router(login.login_route)
 app.include_router(transaction.transact_route)
 app.include_router(category.category_route)
+app.include_router(refresh_token.refresh_route)
+
 
 
 
